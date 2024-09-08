@@ -26,6 +26,7 @@ class SendEmail extends Command
      */
     public function handle()
     {
+        //dispatch job to send post email
         SendPostEmail::dispatch();
     }
 }

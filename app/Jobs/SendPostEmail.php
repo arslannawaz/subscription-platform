@@ -49,14 +49,18 @@ class SendPostEmail implements ShouldQueue
         //$subscribe_users = Subscribe::get();
         
         foreach ($subscribe_users as $subscribe_user) {
+
+            //get posts which has not been sent to user yet
             $posts = Post::where('website_id', $subscribe_user->website_id)
                 ->whereDoesntHave('userPostEmails', function ($query) use ($subscribe_user) {
                     $query->where('user_id', $subscribe_user->user_id);
                 })->get();
         
             foreach ($posts as $post) {
+                //send email
                 Mail::to($subscribe_user->user->email)->send(new SendEmail($post));
         
+                //adding data to UserPostEmail to keep record
                 UserPostEmail::firstOrCreate([
                     'user_id' => $subscribe_user->user_id,
                     'post_id' => $post->id,

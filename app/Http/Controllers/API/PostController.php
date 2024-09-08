@@ -10,6 +10,9 @@ use App\Http\Requests\Post\StoreRequest;
 
 class PostController extends Controller
 {
+    /**
+     * create new post
+     */
     public function create(StoreRequest $request)
     {
         Post::updateOrCreate([

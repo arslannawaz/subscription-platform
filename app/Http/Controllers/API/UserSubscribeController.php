@@ -10,6 +10,9 @@ use App\Http\Requests\UserSubscribe\StoreRequest;
 
 class UserSubscribeController extends Controller
 {
+    /**
+     * subscribe user to website
+     */
     public function create(StoreRequest $request)
     {
         $website = Website::find($request->website_id);
