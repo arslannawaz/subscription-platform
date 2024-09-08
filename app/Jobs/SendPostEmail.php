@@ -14,8 +14,9 @@ use App\Models\Subscribe;
 use App\Models\Post;
 use App\Models\UserPostEmail;
 use App\Mail\SendEmail;
-
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
 
 class SendPostEmail implements ShouldQueue
 {
@@ -26,7 +27,6 @@ class SendPostEmail implements ShouldQueue
      */
     public function __construct()
     {
-        
     }
 
     /**
@@ -34,14 +34,19 @@ class SendPostEmail implements ShouldQueue
      */
     public function handle(): void
     {
+        $cache = app()->make('cache');
         Log::info("email notification start");
-        $this->sendPostNotification();
+        $this->sendPostNotification($cache);
         Log::info("email notification end");
     }
 
-    public function sendPostNotification()
+    public function sendPostNotification($cache)
     {
-        $subscribe_users = Subscribe::get();
+        //Cache the data to avoid query each time
+        $subscribe_users = $cache->remember('subscribe_users', 60, function () {
+            return Subscribe::all();
+        });
+        //$subscribe_users = Subscribe::get();
         
         foreach ($subscribe_users as $subscribe_user) {
             $posts = Post::where('website_id', $subscribe_user->website_id)
